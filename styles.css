@@ -765,21 +765,72 @@ body {
 /* 响应式 */
 @media (max-width: 768px) {
     .sidebar {
-        width: 60px;
+        width: 70px;
+        overflow-x: hidden;
     }
     
-    .logo-text,
-    .nav-text {
+    .logo {
+        padding: 16px 8px;
+        justify-content: center;
+    }
+    
+    .logo-icon {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .logo-text {
         display: none;
+    }
+    
+    .nav-menu {
+        padding: 12px 8px;
+    }
+    
+    .nav-item {
+        flex-direction: column;
+        gap: 4px;
+        padding: 10px 4px;
+        text-align: center;
+    }
+    
+    .nav-icon {
+        width: 24px;
+        height: 24px;
+    }
+    
+    .nav-text {
+        font-size: 11px;
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
     }
     
     .nav-footer {
-        display: none;
+        padding: 12px 8px;
+        gap: 6px;
+    }
+    
+    .btn-export, .btn-import, .btn-clear {
+        padding: 8px 4px;
+        font-size: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+    }
+    
+    .btn-icon-svg {
+        width: 18px;
+        height: 18px;
+        margin-right: 0;
     }
     
     .main-content {
-        margin-left: 60px;
-        max-width: calc(100% - 60px);
+        margin-left: 70px;
+        max-width: calc(100% - 70px);
         padding: 16px;
     }
     
