@@ -834,12 +834,39 @@ body {
         padding: 16px;
     }
     
+    /* 总览看板卡片：手机端固定单列，占满剩余宽度 */
     .card-grid {
         grid-template-columns: 1fr;
+        gap: 12px;
     }
     
+    .card-grid .card {
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+    
+    /* 总览看板图表区域：手机端固定单列 */
     .chart-row {
         grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .chart-row .chart-container,
+    .chart-row .asset-chart-small {
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+    
+    /* 指标卡片网格 */
+    .metric-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+    
+    .metric-card {
+        min-width: 0;
     }
     
     .form-row {
