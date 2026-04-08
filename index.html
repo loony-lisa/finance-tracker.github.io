@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>家庭财务管理工具</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
+    <!-- IconPark SVG Sprite -->
+    <svg style="display: none;">
+        <defs>
+            <!-- 钱包/Logo -->
+            <symbol id="icon-wallet" viewBox="0 0 48 48">
+                <path d="M6 12h36v24H6z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+                <path d="M6 12V8a2 2 0 0 1 2-2h32a2 2 0 0 1 2 2v4M34 20h8v8h-8z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+            </symbol>
+            <!-- 图表/总览 -->
+            <symbol id="icon-chart-pie" viewBox="0 0 48 48">
+                <path d="M24 4v20h20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M24 4c11.046 0 20 8.954 20 20s-8.954 20-20 20S4 35.046 4 24 12.954 4 24 4z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+            </symbol>
+            <!-- 钻石/资产 -->
+            <symbol id="icon-diamond" viewBox="0 0 48 48">
+                <path d="M6 16L12 8h24l6 8-18 24L6 16z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+                <path d="M12 8l12 32 12-32M6 16h36" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+            </symbol>
+            <!-- 趋势/投资 -->
+            <symbol id="icon-trend" viewBox="0 0 48 48">
+                <path d="M4 36l12-16 8 10 8-10 12 16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M40 28v8h-8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </symbol>
+            <!-- 信用卡/负债 -->
+            <symbol id="icon-credit-card" viewBox="0 0 48 48">
+                <path d="M6 12h36v24H6z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+                <path d="M6 20h36M14 30h12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </symbol>
+            <!-- 保护/保险 -->
+            <symbol id="icon-protect" viewBox="0 0 48 48">
+                <path d="M24 4L6 10v14c0 11.046 7.68 21.32 18 24 10.32-2.68 18-12.954 18-24V10L24 4z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+                <path d="M16 22l6 6 12-12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </symbol>
+            <!-- 笔记/消费 -->
+            <symbol id="icon-notes" viewBox="0 0 48 48">
+                <path d="M10 6h28v36H10z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+                <path d="M16 16h16M16 24h16M16 32h10" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </symbol>
+            <!-- 搜索/分析 -->
+            <symbol id="icon-analysis" viewBox="0 0 48 48">
+                <path d="M24 4v8M24 36v8M4 24h8M36 24h8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                <circle cx="24" cy="24" r="8" fill="none" stroke="currentColor" stroke-width="3"/>
+                <path d="M30 30l8 8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+            </symbol>
+            <!-- 导出 -->
+            <symbol id="icon-download" viewBox="0 0 48 48">
+                <path d="M24 4v28M12 24l12 12 12-12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M6 36v6h36v-6" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </symbol>
+            <!-- 导入 -->
+            <symbol id="icon-upload" viewBox="0 0 48 48">
+                <path d="M24 44V16M12 28l12-12 12 12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M6 10V4h36v6" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </symbol>
+            <!-- 空状态 -->
+            <symbol id="icon-empty" viewBox="0 0 48 48">
+                <path d="M24 4v8M24 36v8M4 24h8M36 24h8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                <circle cx="24" cy="24" r="12" fill="none" stroke="currentColor" stroke-width="3"/>
+            </symbol>
+            <!-- 现金 -->
+            <symbol id="icon-cash" viewBox="0 0 48 48">
+                <circle cx="24" cy="24" r="18" fill="none" stroke="currentColor" stroke-width="3"/>
+                <path d="M24 16v16M20 20h4M24 28h4" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+            </symbol>
+            <!-- 银行/稳健 -->
+            <symbol id="icon-bank" viewBox="0 0 48 48">
+                <path d="M4 18L24 6l20 12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M8 18v22M24 18v22M40 18v22M4 40h40" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </symbol>
+            <!-- 投资标签 -->
+            <symbol id="icon-invest" viewBox="0 0 48 48">
+                <path d="M4 36l10-16 8 10 8-10 14 20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="40" cy="10" r="4" fill="none" stroke="currentColor" stroke-width="3"/>
+            </symbol>
+            <!-- 房产 -->
+            <symbol id="icon-house" viewBox="0 0 48 48">
+                <path d="M6 20L24 6l18 14v22H6V20z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+                <path d="M18 42V28h12v14" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+            </symbol>
+            <!-- 股票 -->
+            <symbol id="icon-stock" viewBox="0 0 48 48">
+                <path d="M6 36l12-16 8 10 8-10 12 16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M40 28v8h-8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </symbol>
+            <!-- 货币 -->
+            <symbol id="icon-currency" viewBox="0 0 48 48">
+                <circle cx="24" cy="24" r="18" fill="none" stroke="currentColor" stroke-width="3"/>
+                <path d="M18 18h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4h-8v-8zM18 26h10a4 4 0 0 1 4 4 4 4 0 0 1-4 4H18v-8z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+            </symbol>
+            <!-- 基金 -->
+            <symbol id="icon-fund" viewBox="0 0 48 48">
+                <path d="M6 40V20l12-8 12 8 12-8v20" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="18" cy="14" r="4" fill="none" stroke="currentColor" stroke-width="3"/>
+                <circle cx="30" cy="22" r="4" fill="none" stroke="currentColor" stroke-width="3"/>
+                <circle cx="42" cy="14" r="4" fill="none" stroke="currentColor" stroke-width="3"/>
+            </symbol>
+            <!-- 黄金 -->
+            <symbol id="icon-gold" viewBox="0 0 48 48">
+                <path d="M24 4l16 36H8L24 4z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>
+                <path d="M16 28h16" fill="none" stroke="currentColor" stroke-width="3"/>
+            </symbol>
+        </defs>
+    </svg>
+</head>
+<body>
+    <div id="app">
+        <!-- 侧边导航 -->
+        <nav class="sidebar">
+            <div class="logo">
+                <svg class="logo-icon"><use href="#icon-wallet"/></svg>
+                <span class="logo-text">家庭财务</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item active" data-page="dashboard">
+                    <svg class="nav-icon"><use href="#icon-chart-pie"/></svg>
+                    <span class="nav-text">总览看板</span>
+                </li>
+                <li class="nav-item" data-page="assets">
+                    <svg class="nav-icon"><use href="#icon-diamond"/></svg>
+                    <span class="nav-text">资产管理</span>
+                </li>
+                <li class="nav-item" data-page="investment">
+                    <svg class="nav-icon"><use href="#icon-trend"/></svg>
+                    <span class="nav-text">投资理财</span>
+                </li>
+                <li class="nav-item" data-page="liabilities">
+                    <svg class="nav-icon"><use href="#icon-credit-card"/></svg>
+                    <span class="nav-text">负债管理</span>
+                </li>
+                <li class="nav-item" data-page="insurance">
+                    <svg class="nav-icon"><use href="#icon-protect"/></svg>
+                    <span class="nav-text">保险管理</span>
+                </li>
+                <li class="nav-item" data-page="expense">
+                    <svg class="nav-icon"><use href="#icon-notes"/></svg>
+                    <span class="nav-text">消费记录</span>
+                </li>
+                <li class="nav-item" data-page="analysis">
+                    <svg class="nav-icon"><use href="#icon-analysis"/></svg>
+                    <span class="nav-text">财务分析</span>
+                </li>
+            </ul>
+            <div class="nav-footer">
+                <button class="btn-export" onclick="exportData()">
+                    <svg class="btn-icon-svg"><use href="#icon-download"/></svg>
+                    导出数据
+                </button>
+                <button class="btn-import" onclick="importData()">
+                    <svg class="btn-icon-svg"><use href="#icon-upload"/></svg>
+                    导入数据
+                </button>
+                <button class="btn-clear" onclick="clearAllData()">
+                    <svg class="btn-icon-svg"><use href="#icon-empty"/></svg>
+                    清空所有数据
+                </button>
+            </div>
+        </nav>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 顶部栏 -->
+            <header class="header">
+                <h1 id="page-title">财务总览</h1>
+                <div class="header-actions">
+                    <span class="last-update">最后更新: <span id="last-update-time">--</span></span>
+                    <button id="header-add-btn" class="btn-primary" onclick="openModal()">+ 新增记录</button>
+                </div>
+            </header>
+
+            <!-- 页面内容 -->
+            <div id="page-content">
+                <!-- 动态加载 -->
+            </div>
+        </main>
+    </div>
+
+    <!-- 新增/编辑弹窗 -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">新增资产</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="data-form">
+                    <!-- 动态表单内容 -->
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal()">取消</button>
+                <button class="btn-primary" onclick="saveFormData()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 导入弹窗 -->
+    <div id="import-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>导入数据</h2>
+                <button class="modal-close" onclick="closeImportModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <textarea id="import-data" placeholder="在此粘贴JSON数据..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeImportModal()">取消</button>
+                <button class="btn-primary" onclick="confirmImport()">导入</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 清空数据确认弹窗 -->
+    <div id="clear-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="color: var(--danger-color);">确认清空所有数据</h2>
+                <button class="modal-close" onclick="closeClearModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="clear-warning">
+                    <p><strong>此操作不可撤销！</strong></p>
+                    <p>即将清空以下所有数据：</p>
+                    <ul style="margin: 12px 0; padding-left: 20px; color: var(--text-secondary);">
+                        <li>现金资产</li>
+                        <li>定期存款、公积金</li>
+                        <li>股票、基金、理财产品</li>
+                        <li>贵金属、实物资产</li>
+                        <li>负债记录</li>
+                        <li>保险记录</li>
+                        <li>消费记录</li>
+                    </ul>
+                    <p style="color: var(--danger-color); font-weight: 600;">建议先导出数据备份！</p>
+                    <div class="form-group" style="margin-top: 20px;">
+                        <label>请输入 "DELETE" 确认清空：</label>
+                        <input type="text" id="clear-confirm-input" placeholder="DELETE" autocomplete="off">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeClearModal()">取消</button>
+                <button class="btn-danger" onclick="confirmClearAllData()">确认清空</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script src="app-forms.js"></script>
+</body>
+</html>
