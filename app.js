@@ -572,25 +572,25 @@ async function renderInvestmentPage() {
         
         <div class="tab-actions">
             <div class="tab-total" data-tab="stocks" style="display: ${currentInvestTab === 'stocks' ? 'block' : 'none'};">
-                股票总额: <span class="amount positive">¥${formatNumber(stocksTotal)}</span>
+                股票总额: <span class="amount">¥${formatNumber(stocksTotal)}</span>
                 <div class="tab-profit ${stocksTotalProfit >= 0 ? 'positive' : 'negative'}">
                     ${stocksTotalProfit >= 0 ? '+' : ''}¥${formatNumber(stocksTotalProfit)}
                 </div>
             </div>
             <div class="tab-total" data-tab="currency" style="display: ${currentInvestTab === 'currency' ? 'block' : 'none'};">
-                货币理财总额: <span class="amount positive">¥${formatNumber(stats.currencyTotal)}</span>
+                货币理财总额: <span class="amount">¥${formatNumber(stats.currencyTotal)}</span>
             </div>
             <div class="tab-total" data-tab="funds" style="display: ${currentInvestTab === 'funds' ? 'block' : 'none'};">
-                基金总额: <span class="amount positive">¥${formatNumber(fundsTotal)}</span>
+                基金总额: <span class="amount">¥${formatNumber(fundsTotal)}</span>
                 <div class="tab-profit ${fundsTotalProfit >= 0 ? 'positive' : 'negative'}">
                     ${fundsTotalProfit >= 0 ? '+' : ''}¥${formatNumber(fundsTotalProfit)}
                 </div>
             </div>
             <div class="tab-total" data-tab="wealth" style="display: ${currentInvestTab === 'wealth' ? 'block' : 'none'};">
-                理财总额: <span class="amount positive">¥${formatNumber(wealthTotal)}</span>
+                理财总额: <span class="amount">¥${formatNumber(wealthTotal)}</span>
             </div>
             <div class="tab-total" data-tab="gold" style="display: ${currentInvestTab === 'gold' ? 'block' : 'none'};">
-                贵金属总额: <span class="amount positive">¥${formatNumber(stats.goldTotal)}</span>
+                贵金属总额: <span class="amount">¥${formatNumber(stats.goldTotal)}</span>
             </div>
             <button class="btn-primary" onclick="openModal()">+ 新增记录</button>
         </div>
@@ -637,7 +637,6 @@ function renderStocks(stocksA, stocksB, stats) {
                 <div class="asset-section-title">
                     <svg class="section-icon"><use href="#icon-stock"/></svg>
                     A股
-                    <span class="tag tag-invest">投资</span>
                 </div>
                 <div class="asset-section-total">¥${formatNumber(stats.stocksATotal)}</div>
             </div>
@@ -649,7 +648,6 @@ function renderStocks(stocksA, stocksB, stats) {
                 <div class="asset-section-title">
                     <svg class="section-icon"><use href="#icon-currency"/></svg>
                     B股
-                    <span class="tag tag-invest">投资</span>
                 </div>
                 <div class="asset-section-total">¥${formatNumber(stats.stocksBTotal)}</div>
             </div>
@@ -710,7 +708,7 @@ function renderFunds(funds, stats) {
             return `
                 <div class="asset-item">
                     <div class="asset-info">
-                        <div class="asset-name">${item.name}</div>
+                        <div class="asset-name">${item.name} ${item.platform === 'bank' ? '<span class="tag tag-bank">银行</span>' : '<span class="tag tag-alipay">支付宝</span>'}</div>
                         <div class="asset-detail">本金: ¥${formatNumber(item.principal || item.amount)} | ${item.risk || '未知风险'}</div>
                     </div>
                     <div style="text-align: right;">

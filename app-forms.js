@@ -50,7 +50,8 @@ const FORM_CONFIG = {
         title: '现金资产',
         fields: [
             { name: 'name', label: '名称', type: 'text', required: true, placeholder: '如: 支付宝余额' },
-            { name: 'account', label: '账户', type: 'text', placeholder: '如: 138****8888' },
+            { name: 'account', label: '账户平台', type: 'select',
+              options: ['支付宝', '微信', '银行', '证券'] },
             { name: 'amount', label: '金额', type: 'number', required: true, step: '0.01' }
         ],
         storeKey: STORE_KEYS.CASH
@@ -82,7 +83,8 @@ const FORM_CONFIG = {
               options: ['deposit', 'provident', 'bond', 'other'],
               optionLabels: { deposit: '定期存单', provident: '公积金', bond: '国债', other: '其他稳健资产' } },
             // 定期存单字段
-            { name: 'bank', label: '银行', type: 'text', required: true,
+            { name: 'bank', label: '银行', type: 'select', required: true,
+              options: ['中国银行', '工商银行', '交通银行', '招商银行', '浦发银行'],
               showWhen: { field: 'stableType', value: 'deposit' } },
             // 公积金字段
             { name: 'city', label: '城市', type: 'text', required: true,
@@ -228,7 +230,8 @@ const FORM_CONFIG = {
               options: ['USD', 'EUR', 'GBP', 'JPY', 'HKD', 'AUD', 'CHF', '其他'] },
             { name: 'amount', label: '持有金额', type: 'number', required: true, step: '0.01' },
             { name: 'rate', label: '当前汇率', type: 'number', required: true, step: '0.0001' },
-            { name: 'platform', label: '平台', type: 'text', placeholder: '如: 中国银行' }
+            { name: 'platform', label: '平台', type: 'select', required: true,
+              options: ['中国银行', '交通银行'] }
         ],
         storeKey: STORE_KEYS.CURRENCY,
         calculate: (data) => {
