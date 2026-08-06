@@ -447,6 +447,14 @@ body {
     color: var(--danger-color);
 }
 
+/* 资产管理和投资理财页面：绿色数字改为 #3b4563 */
+.page-assets .amount.positive,
+.page-assets .asset-section-total,
+.page-investment .amount.positive,
+.page-investment .asset-section-total {
+    color: #3b4563;
+}
+
 /* 分类标签 */
 .tag {
     display: inline-block;
@@ -461,6 +469,8 @@ body {
 .tag-invest { background: #fef3c7; color: #92400e; }
 .tag-bank { background: #fef3c7; color: #92400e; }
 .tag-alipay { background: #dbeafe; color: #1e40af; }
+.tag-wechat { background: #d1fae5; color: #065f46; }
+.tag-securities { background: #f3e8d3; color: #7c4a1f; }
 .tag-physical { background: #ede9fe; color: #5b21b6; }
 .tag-debt { background: #fee2e2; color: #991b1b; }
 .tag-insurance { background: #fce7f3; color: #9d174d; }
@@ -626,6 +636,23 @@ body {
 
 .asset-name {
     font-weight: 500;
+    display: flex;
+    align-items: center;
+}
+
+.asset-amount {
+    margin-left: 4em;
+    white-space: nowrap;
+}
+
+.bank-logo {
+    height: 24px;
+    width: auto;
+    max-width: 48px;
+    object-fit: contain;
+    margin-right: 8px;
+    border-radius: 4px;
+    flex-shrink: 0;
 }
 
 .asset-detail {

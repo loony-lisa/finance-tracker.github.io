@@ -67,6 +67,7 @@ async function loadPage(page) {
     const content = document.getElementById('page-content');
     const title = document.getElementById('page-title');
     const addBtn = document.getElementById('header-add-btn');
+    content.className = `page-content page-${page}`;
     
     // 总览看板、资产管理、投资理财隐藏顶部新增按钮（这两页的新增按钮放在页签下）
     if (addBtn) {
@@ -213,14 +214,14 @@ async function renderDashboard() {
     const assetAllocation = {
         labels: ['现金流动', '稳健资产', '投资理财', '实物资产'],
         data: [stats.cashTotal, stats.stableTotal, stats.investTotal, stats.physicalTotal],
-        colors: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6']
+        colors: ['#744949', '#EDC2AD', '#729d83', '#3d6871']
     };
     
     // 投资理财占比数据
     const investAllocation = {
         labels: ['A股', 'B股', '货币理财', '基金', '理财产品', '贵金属'],
         data: [stats.stocksATotal, stats.stocksBTotal, stats.currencyTotal, stats.fundsTotal, stats.wealthTotal, stats.goldTotal],
-        colors: ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b', '#ec4899', '#eab308']
+        colors: ['#744949', '#EDC2AD', '#729d83', '#3d6871', '#3b4563', '#574e5f']
     };
 
     setTimeout(() => {
@@ -375,19 +376,28 @@ function renderCashAssets(cashData, total) {
     if (cashData.length === 0) {
         return renderEmptyState('暂无现金类资产', 'cash');
     }
-    
+
+    const getPlatformTag = (platform) => {
+        const tagClass = {
+            '银行': 'tag-bank',
+            '支付宝': 'tag-alipay',
+            '微信': 'tag-wechat',
+            '证券': 'tag-securities'
+        }[platform];
+        return tagClass ? `<span class="tag ${tagClass}">${platform}</span>` : '';
+    };
+
     const items = cashData.map(item => `
         <div class="asset-item">
-            <div class="asset-info">
-                <div class="asset-name">${item.name}</div>
-                <div class="asset-detail">${item.account || '无账户信息'}</div>
-            </div>
-            <div style="text-align: right;">
-                <div class="amount positive">¥${formatNumber(item.amount)}</div>
-                <div class="asset-actions" style="margin-top: 8px;">
-                    <button class="btn-icon" onclick="editItem('cash', '${item.id}')">编辑</button>
-                    <button class="btn-icon" onclick="deleteItem('cash', '${item.id}')">删除</button>
+            <div class="asset-info" style="flex: 1;">
+                <div class="asset-name">
+                    <span>${item.name}${getPlatformTag(item.account)}</span>
+                    <span class="asset-amount amount positive">¥${formatNumber(item.amount)}</span>
                 </div>
+            </div>
+            <div class="asset-actions">
+                <button class="btn-icon" onclick="editItem('cash', '${item.id}')">编辑</button>
+                <button class="btn-icon" onclick="deleteItem('cash', '${item.id}')">删除</button>
             </div>
         </div>
     `).join('');
@@ -407,6 +417,23 @@ function renderCashAssets(cashData, total) {
     `;
 }
 
+function getBankLogoPath(bankName) {
+    const logoMap = {
+        '中国银行': 'Bank of China.png',
+        '工商银行': 'ICBC.png',
+        '交通银行': 'Bank of Communications.png',
+        '招商银行': 'China Merchants Bank.png',
+        '浦发银行': 'SPD Bank.png'
+    };
+    const logoFile = logoMap[bankName] || Object.entries(logoMap).find(([key]) => bankName && bankName.includes(key))?.[1];
+    return logoFile ? `bank_logos/${logoFile}` : null;
+}
+
+function renderBankLogo(bankName) {
+    const logoPath = getBankLogoPath(bankName);
+    return logoPath ? `<img src="${logoPath}" alt="${bankName}" class="bank-logo" onerror="this.style.display='none'">` : '';
+}
+
 function renderStableAssets(deposits, provident, total) {
     const depositItems = deposits.map(item => {
         const daysUntilDue = Math.ceil((new Date(item.dueDate) - new Date()) / (1000 * 60 * 60 * 24));
@@ -422,16 +449,16 @@ function renderStableAssets(deposits, provident, total) {
         
         return `
             <div class="asset-item ${dueClass}">
-                <div class="asset-info">
-                    <div class="asset-name">${item.bank} ${dueBadge}</div>
+                <div class="asset-info" style="flex: 1;">
+                    <div class="asset-name">
+                        <span>${renderBankLogo(item.bank)}${item.bank} ${dueBadge}</span>
+                        <span class="asset-amount amount positive">¥${formatNumber(item.amount)}</span>
+                    </div>
                     <div class="asset-detail">${item.rate}% | 到期: ${item.dueDate}</div>
                 </div>
-                <div style="text-align: right;">
-                    <div class="amount positive">¥${formatNumber(item.amount)}</div>
-                    <div class="asset-actions" style="margin-top: 8px;">
-                        <button class="btn-icon" onclick="editItem('deposit', '${item.id}')">编辑</button>
-                        <button class="btn-icon" onclick="deleteItem('deposit', '${item.id}')">删除</button>
-                    </div>
+                <div class="asset-actions">
+                    <button class="btn-icon" onclick="editItem('deposit', '${item.id}')">编辑</button>
+                    <button class="btn-icon" onclick="deleteItem('deposit', '${item.id}')">删除</button>
                 </div>
             </div>
         `;
@@ -439,16 +466,16 @@ function renderStableAssets(deposits, provident, total) {
     
     const providentItems = provident.map(item => `
         <div class="asset-item">
-            <div class="asset-info">
-                <div class="asset-name">${item.city}公积金</div>
+            <div class="asset-info" style="flex: 1;">
+                <div class="asset-name">
+                    <span>${item.city}公积金</span>
+                    <span class="asset-amount amount positive">¥${formatNumber(item.amount)}</span>
+                </div>
                 <div class="asset-detail">账户: ${item.account || '未填写'}</div>
             </div>
-            <div style="text-align: right;">
-                <div class="amount positive">¥${formatNumber(item.amount)}</div>
-                <div class="asset-actions" style="margin-top: 8px;">
-                    <button class="btn-icon" onclick="editItem('provident', '${item.id}')">编辑</button>
-                    <button class="btn-icon" onclick="deleteItem('provident', '${item.id}')">删除</button>
-                </div>
+            <div class="asset-actions">
+                <button class="btn-icon" onclick="editItem('provident', '${item.id}')">编辑</button>
+                <button class="btn-icon" onclick="deleteItem('provident', '${item.id}')">删除</button>
             </div>
         </div>
     `).join('');
@@ -487,18 +514,18 @@ function renderPhysicalAssets(physicalData, total) {
     
     const items = physicalData.map(item => `
         <div class="asset-item">
-            <div class="asset-info">
-                <div class="asset-name">${item.name}</div>
+            <div class="asset-info" style="flex: 1;">
+                <div class="asset-name">
+                    <span>${item.name}</span>
+                    <span class="asset-amount amount positive">¥${formatNumber(item.value)}</span>
+                </div>
                 <div class="asset-detail">
                     ${item.type === 'house' ? '<svg class="detail-icon"><use href="#icon-house"/></svg> 房产' : '<svg class="detail-icon"><use href="#icon-credit-card"/></svg> 车辆'} | ${item.description || '无描述'}
                 </div>
             </div>
-            <div style="text-align: right;">
-                <div class="amount positive">¥${formatNumber(item.value)}</div>
-                <div class="asset-actions" style="margin-top: 8px;">
-                    <button class="btn-icon" onclick="editItem('physical', '${item.id}')">编辑</button>
-                    <button class="btn-icon" onclick="deleteItem('physical', '${item.id}')">删除</button>
-                </div>
+            <div class="asset-actions">
+                <button class="btn-icon" onclick="editItem('physical', '${item.id}')">编辑</button>
+                <button class="btn-icon" onclick="deleteItem('physical', '${item.id}')">删除</button>
             </div>
         </div>
     `).join('');
@@ -612,19 +639,16 @@ function renderStocks(stocksA, stocksB, stats) {
             
             return `
                 <div class="asset-item">
-                    <div class="asset-info">
-                        <div class="asset-name">${item.name} (${item.code}) <span class="tag tag-invest">${typeLabel}</span></div>
-                        <div class="asset-detail">持仓: ${item.shares || 0}股 | 成本: ¥${formatNumber(costPerShare)}/股 | 现价: ¥${formatNumber(pricePerShare)}/股</div>
+                    <div class="asset-info" style="flex: 1;">
+                        <div class="asset-name">
+                            <span>${item.name} (${item.code})<span class="tag tag-invest">${typeLabel}</span></span>
+                            <span class="asset-amount amount positive">¥${formatNumber(item.marketValue)}</span>
+                        </div>
+                        <div class="asset-detail">持仓: ${item.shares || 0}股 | 成本: ¥${formatNumber(costPerShare)}/股 | 现价: ¥${formatNumber(pricePerShare)}/股 | 盈亏: <span class="${profit >= 0 ? 'positive' : 'negative'}">${profit >= 0 ? '+' : ''}¥${formatNumber(profit)} (${profitRate.toFixed(2)}%)</span></div>
                     </div>
-                    <div style="text-align: right;">
-                        <div class="amount positive">¥${formatNumber(item.marketValue)}</div>
-                        <div class="asset-detail ${profit >= 0 ? 'positive' : 'negative'}">
-                            ${profit >= 0 ? '+' : ''}¥${formatNumber(profit)} (${profitRate.toFixed(2)}%)
-                        </div>
-                        <div class="asset-actions" style="margin-top: 4px;">
-                            <button class="btn-icon" onclick="editItem('${type}', '${item.id}')">编辑</button>
-                            <button class="btn-icon" onclick="deleteItem('${type}', '${item.id}')">删除</button>
-                        </div>
+                    <div class="asset-actions">
+                        <button class="btn-icon" onclick="editItem('${type}', '${item.id}')">编辑</button>
+                        <button class="btn-icon" onclick="deleteItem('${type}', '${item.id}')">删除</button>
                     </div>
                 </div>
             `;
@@ -663,16 +687,16 @@ function renderCurrencyInvest(currencyData, total) {
     
     const items = currencyData.map(item => `
         <div class="asset-item">
-            <div class="asset-info">
-                <div class="asset-name">${item.currency} ${item.amount}</div>
+            <div class="asset-info" style="flex: 1;">
+                <div class="asset-name">
+                    <span>${item.currency} ${item.amount}</span>
+                    <span class="asset-amount amount positive">≈ ¥${formatNumber(item.cnyValue)}</span>
+                </div>
                 <div class="asset-detail">汇率: ${item.rate} | ${item.platform || '未知平台'}</div>
             </div>
-            <div style="text-align: right;">
-                <div class="amount positive">≈ ¥${formatNumber(item.cnyValue)}</div>
-                <div class="asset-actions" style="margin-top: 8px;">
-                    <button class="btn-icon" onclick="editItem('currency', '${item.id}')">编辑</button>
-                    <button class="btn-icon" onclick="deleteItem('currency', '${item.id}')">删除</button>
-                </div>
+            <div class="asset-actions">
+                <button class="btn-icon" onclick="editItem('currency', '${item.id}')">编辑</button>
+                <button class="btn-icon" onclick="deleteItem('currency', '${item.id}')">删除</button>
             </div>
         </div>
     `).join('');
@@ -707,19 +731,16 @@ function renderFunds(funds, stats) {
             const profit = parseFloat(item.amount) - parseFloat(item.principal || 0);
             return `
                 <div class="asset-item">
-                    <div class="asset-info">
-                        <div class="asset-name">${item.name} ${item.platform === 'bank' ? '<span class="tag tag-bank">银行</span>' : '<span class="tag tag-alipay">支付宝</span>'}</div>
-                        <div class="asset-detail">本金: ¥${formatNumber(item.principal || item.amount)} | ${item.risk || '未知风险'}</div>
+                    <div class="asset-info" style="flex: 1;">
+                        <div class="asset-name">
+                            <span>${item.name}${item.platform === 'bank' ? '<span class="tag tag-bank">银行</span>' : '<span class="tag tag-alipay">支付宝</span>'}</span>
+                            <span class="asset-amount amount positive">¥${formatNumber(item.amount)}</span>
+                        </div>
+                        <div class="asset-detail">本金: ¥${formatNumber(item.principal || item.amount)} | 盈亏: <span class="${profit >= 0 ? 'positive' : 'negative'}">${profit >= 0 ? '+' : ''}¥${formatNumber(profit)}</span> | ${item.risk || '未知风险'}</div>
                     </div>
-                    <div style="text-align: right;">
-                        <div class="amount positive">¥${formatNumber(item.amount)}</div>
-                        <div class="asset-detail ${profit >= 0 ? 'positive' : 'negative'}">
-                            盈亏: ${profit >= 0 ? '+' : ''}¥${formatNumber(profit)}
-                        </div>
-                        <div class="asset-actions" style="margin-top: 4px;">
-                            <button class="btn-icon" onclick="editItem('funds', '${item.id}')">编辑</button>
-                            <button class="btn-icon" onclick="deleteItem('funds', '${item.id}')">删除</button>
-                        </div>
+                    <div class="asset-actions">
+                        <button class="btn-icon" onclick="editItem('funds', '${item.id}')">编辑</button>
+                        <button class="btn-icon" onclick="deleteItem('funds', '${item.id}')">删除</button>
                     </div>
                 </div>
             `;
@@ -760,19 +781,16 @@ function renderWealthProducts(wealth, stats) {
     const renderList = (items) => {
         return items.map(item => `
             <div class="asset-item">
-                <div class="asset-info">
-                    <div class="asset-name">${item.name}</div>
+                <div class="asset-info" style="flex: 1;">
+                    <div class="asset-name">
+                        <span>${item.name}${item.platform === 'bank' ? '<span class="tag tag-bank">银行</span>' : '<span class="tag tag-alipay">支付宝</span>'}</span>
+                        <span class="asset-amount amount positive">¥${formatNumber(item.amount)}</span>
+                    </div>
                     <div class="asset-detail">${item.rate}% | ${item.term || '活期'}</div>
                 </div>
-                <div style="text-align: right;">
-                    <div class="amount positive">¥${formatNumber(item.amount)}</div>
-                    <div class="asset-detail" style="color: var(--text-secondary); font-size: 12px;">
-                        ${item.platform === 'bank' ? '<svg class="inline-icon"><use href="#icon-bank"/></svg> 银行' : '<svg class="inline-icon"><use href="#icon-wallet"/></svg> 支付宝'}
-                    </div>
-                    <div class="asset-actions" style="margin-top: 4px;">
-                        <button class="btn-icon" onclick="editItem('wealth', '${item.id}')">编辑</button>
-                        <button class="btn-icon" onclick="deleteItem('wealth', '${item.id}')">删除</button>
-                    </div>
+                <div class="asset-actions">
+                    <button class="btn-icon" onclick="editItem('wealth', '${item.id}')">编辑</button>
+                    <button class="btn-icon" onclick="deleteItem('wealth', '${item.id}')">删除</button>
                 </div>
             </div>
         `).join('');
@@ -806,19 +824,19 @@ function renderGoldAssets(goldData, total) {
     
     const items = goldData.map(item => `
         <div class="asset-item">
-            <div class="asset-info">
-                <div class="asset-name">${item.name}</div>
+            <div class="asset-info" style="flex: 1;">
+                <div class="asset-name">
+                    <span>${item.name}</span>
+                    <span class="asset-amount amount positive">¥${formatNumber(item.cnyValue)}</span>
+                </div>
                 <div class="asset-detail">
                     ${item.type === 'accumulate' ? '<svg class="detail-icon"><use href="#icon-gold"/></svg> 积存金' : '<svg class="detail-icon"><use href="#icon-diamond"/></svg> 实物黄金'} | 
                     ${item.weight}克 @ ¥${item.price}/克
                 </div>
             </div>
-            <div style="text-align: right;">
-                <div class="amount positive">¥${formatNumber(item.cnyValue)}</div>
-                <div class="asset-actions" style="margin-top: 8px;">
-                    <button class="btn-icon" onclick="editItem('gold', '${item.id}')">编辑</button>
-                    <button class="btn-icon" onclick="deleteItem('gold', '${item.id}')">删除</button>
-                </div>
+            <div class="asset-actions">
+                <button class="btn-icon" onclick="editItem('gold', '${item.id}')">编辑</button>
+                <button class="btn-icon" onclick="deleteItem('gold', '${item.id}')">删除</button>
             </div>
         </div>
     `).join('');
