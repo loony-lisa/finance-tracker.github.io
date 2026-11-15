@@ -236,7 +236,7 @@ async function renderDashboard() {
                 <div class="card-header">
                     <span class="card-title">净资产</span>
                 </div>
-                <div class="card-value">¥${formatNumber(stats.netWorth)}</div>
+                <div class="card-value">${formatMoney(stats.netWorth)}</div>
                 <span class="card-change ${stats.growthRate >= 0 ? 'positive' : 'negative'}">
                     ${stats.growthRate >= 0 ? '↑' : '↓'} ${Math.abs(stats.growthRate).toFixed(2)}%
                 </span>
@@ -602,7 +602,7 @@ async function renderInvestmentPage() {
             <div class="tab-total" data-tab="stocks" style="display: ${currentInvestTab === 'stocks' ? 'block' : 'none'};">
                 股票总额: <span class="amount">¥${formatNumber(stocksTotal)}</span>
                 <div class="tab-profit ${stocksTotalProfit >= 0 ? 'positive' : 'negative'}">
-                    ${stocksTotalProfit >= 0 ? '+' : ''}¥${formatNumber(stocksTotalProfit)}
+                    ${formatSignedMoney(stocksTotalProfit)}
                 </div>
             </div>
             <div class="tab-total" data-tab="currency" style="display: ${currentInvestTab === 'currency' ? 'block' : 'none'};">
@@ -611,7 +611,7 @@ async function renderInvestmentPage() {
             <div class="tab-total" data-tab="funds" style="display: ${currentInvestTab === 'funds' ? 'block' : 'none'};">
                 基金总额: <span class="amount">¥${formatNumber(fundsTotal)}</span>
                 <div class="tab-profit ${fundsTotalProfit >= 0 ? 'positive' : 'negative'}">
-                    ${fundsTotalProfit >= 0 ? '+' : ''}¥${formatNumber(fundsTotalProfit)}
+                    ${formatSignedMoney(fundsTotalProfit)}
                 </div>
             </div>
             <div class="tab-total" data-tab="wealth" style="display: ${currentInvestTab === 'wealth' ? 'block' : 'none'};">
@@ -645,7 +645,7 @@ function renderStocks(stocksA, stocksB, stats) {
                             <span>${item.name} (${item.code})<span class="tag tag-invest">${typeLabel}</span></span>
                             <span class="asset-amount amount positive">¥${formatNumber(item.marketValue)}</span>
                         </div>
-                        <div class="asset-detail">持仓: ${item.shares || 0}股 | 成本: ¥${formatNumber(costPerShare)}/股 | 现价: ¥${formatNumber(pricePerShare)}/股 | 盈亏: <span class="${profit >= 0 ? 'positive' : 'negative'}">${profit >= 0 ? '+' : ''}¥${formatNumber(profit)} (${profitRate.toFixed(2)}%)</span></div>
+                        <div class="asset-detail">持仓: ${item.shares || 0}股 | 成本: ¥${formatNumber(costPerShare)}/股 | 现价: ¥${formatNumber(pricePerShare)}/股 | 盈亏: <span class="${profit >= 0 ? 'positive' : 'negative'}">${formatSignedMoney(profit)} (${profitRate.toFixed(2)}%)</span></div>
                     </div>
                     <div class="asset-actions">
                         <button class="btn-icon" onclick="editItem('${type}', '${item.id}')">编辑</button>
@@ -737,7 +737,7 @@ function renderFunds(funds, stats) {
                             <span>${item.name}${item.platform === 'bank' ? '<span class="tag tag-bank">银行</span>' : '<span class="tag tag-alipay">支付宝</span>'}</span>
                             <span class="asset-amount amount positive">¥${formatNumber(item.amount)}</span>
                         </div>
-                        <div class="asset-detail">本金: ¥${formatNumber(item.principal || item.amount)} | 盈亏: <span class="${profit >= 0 ? 'positive' : 'negative'}">${profit >= 0 ? '+' : ''}¥${formatNumber(profit)}</span> | ${item.risk || '未知风险'}</div>
+                        <div class="asset-detail">本金: ¥${formatNumber(item.principal || item.amount)} | 盈亏: <span class="${profit >= 0 ? 'positive' : 'negative'}">${formatSignedMoney(profit)}</span> | ${item.risk || '未知风险'}</div>
                     </div>
                     <div class="asset-actions">
                         <button class="btn-icon" onclick="editItem('funds', '${item.id}')">编辑</button>
@@ -877,7 +877,7 @@ async function renderLiabilitiesPage() {
                 </div>
             </div>
             <div style="text-align: right;">
-                <div class="amount negative">-¥${formatNumber(item.amount)}</div>
+                <div class="amount negative">-¥ ${formatNumber(item.amount)}</div>
                 <div class="asset-detail" style="color: var(--text-secondary);">
                     额度: ¥${formatNumber(item.limit || 0)}
                 </div>
@@ -970,7 +970,7 @@ async function renderExpensePage() {
             <td>${item.date}</td>
             <td>${item.category || '未分类'}</td>
             <td>${item.description || '-'}</td>
-            <td class="amount negative">-¥${formatNumber(item.amount)}</td>
+            <td class="amount negative">-¥ ${formatNumber(item.amount)}</td>
             <td>
                 <button class="btn-icon" onclick="editItem('expense', '${item.id}')">编辑</button>
                 <button class="btn-icon" onclick="deleteItem('expense', '${item.id}')">删除</button>
@@ -1296,6 +1296,24 @@ function formatNumber(num) {
     return n.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
+// 格式化金额：负数显示为 -¥ 1,234.00，正数显示为 ¥ 1,234.00
+function formatMoney(num) {
+    if (num === null || num === undefined) return '¥ 0.00';
+    const n = parseFloat(num);
+    if (isNaN(n)) return '¥ 0.00';
+    const absStr = Math.abs(n).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return n < 0 ? `-¥ ${absStr}` : `¥ ${absStr}`;
+}
+
+// 格式化带符号金额：负数显示为 -¥ 1,234.00，正数显示为 +¥ 1,234.00
+function formatSignedMoney(num) {
+    if (num === null || num === undefined) return '+¥ 0.00';
+    const n = parseFloat(num);
+    if (isNaN(n)) return '+¥ 0.00';
+    const absStr = Math.abs(n).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return n < 0 ? `-¥ ${absStr}` : `+¥ ${absStr}`;
+}
+
 function getRiskLevel(months) {
     if (months >= 6) return 'good';
     if (months >= 3) return 'warning';
@@ -1487,7 +1505,7 @@ async function takeNetWorthSnapshot() {
     }
     
     await saveData(STORE_KEYS.SNAPSHOTS, snapshots);
-    alert(`资产快照已记录！\n日期: ${today}\n净资产: ¥${formatNumber(stats.netWorth)}`);
+    alert(`资产快照已记录！\n日期: ${today}\n净资产: ${formatMoney(stats.netWorth)}`);
     await loadPage('dashboard');
 }
 
