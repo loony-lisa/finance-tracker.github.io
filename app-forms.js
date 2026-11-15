@@ -84,7 +84,7 @@ const FORM_CONFIG = {
               optionLabels: { deposit: '定期存单', provident: '公积金', bond: '国债', other: '其他稳健资产' } },
             // 定期存单字段
             { name: 'bank', label: '银行', type: 'select', required: true,
-              options: ['中国银行', '工商银行', '交通银行', '招商银行', '浦发银行'],
+              options: ['中国银行', '工商银行', '交通银行', '招商银行', '浦发银行', '民生银行'],
               showWhen: { field: 'stableType', value: 'deposit' } },
             // 公积金字段
             { name: 'city', label: '城市', type: 'text', required: true,

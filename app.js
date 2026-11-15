@@ -391,7 +391,7 @@ function renderCashAssets(cashData, total) {
         <div class="asset-item">
             <div class="asset-info" style="flex: 1;">
                 <div class="asset-name">
-                    <span>${item.name}${getPlatformTag(item.account)}</span>
+                    <span>${getPlatformTag(item.account)}  ${item.name}</span>
                     <span class="asset-amount amount positive">¥${formatNumber(item.amount)}</span>
                 </div>
             </div>
@@ -423,7 +423,8 @@ function getBankLogoPath(bankName) {
         '工商银行': 'ICBC.png',
         '交通银行': 'Bank of Communications.png',
         '招商银行': 'China Merchants Bank.png',
-        '浦发银行': 'SPD Bank.png'
+        '浦发银行': 'SPD Bank.png',
+        '民生银行': 'China Minsheng Bank.png'
     };
     const logoFile = logoMap[bankName] || Object.entries(logoMap).find(([key]) => bankName && bankName.includes(key))?.[1];
     return logoFile ? `bank_logos/${logoFile}` : null;
@@ -444,7 +445,7 @@ function renderStableAssets(deposits, provident, total) {
             dueBadge = '<span class="due-badge urgent">即将到期</span>';
         } else if (daysUntilDue <= 90) {
             dueClass = 'due-soon';
-            dueBadge = '<span class="due-badge soon">${daysUntilDue}天后到期</span>';
+            dueBadge = `<span class="due-badge soon">${daysUntilDue}天后到期</span>`;
         }
         
         return `
